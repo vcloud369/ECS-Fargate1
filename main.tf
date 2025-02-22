@@ -16,6 +16,8 @@ module "ecr" {
 
 module "ecs" {
   source = "./modules/ecs"
+
+  ecs_cluster_name = var.ecs_cluster_name  # Passing the variable to the module
 }
 
 module "cloudwatch" {
