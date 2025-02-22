@@ -9,9 +9,8 @@ on:
       - main
 
 jobs:
-  terraform-apply:
+  terraform-setup:
     runs-on: ubuntu-latest
-
     steps:
       # Checkout the repository
       - name: Checkout code
@@ -21,20 +20,30 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
 
-      # Install dependencies
-      - name: Install dependencies
-        run: |
-          terraform init
-          terraform validate
+      # Install Terraform dependencies (initialize terraform)
+      - name: Initialize Terraform
+        run: terraform init
 
-      # Run Terraform plan
-      - name: Terraform plan
+      # Validate Terraform configuration
+      - name: Terraform Validate
+        run: terraform validate
+
+      # Run Terraform plan (dry-run to show the changes Terraform will apply)
+      - name: Terraform Plan
         run: terraform plan -var-file=terraform/dev/terraform.tfvars
 
-      # Apply the Terraform plan (Infrastructure creation)
-      - name: Terraform apply
+      # Apply Terraform changes (apply the plan and provision infrastructure)
+      - name: Terraform Apply
         run: terraform apply -auto-approve -var-file=terraform/dev/terraform.tfvars
 
-      # Optional: Save the Terraform output to GitHub Secrets or logs (optional)
-      - name: Terraform output
+      # Optional: Output Terraform status
+      - name: Terraform Output
         run: terraform output
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: terraform-setup
+    steps:
+      - name: Notify success or failure
+        run: |
+          echo "Infrastructure setup completed successfully!"
