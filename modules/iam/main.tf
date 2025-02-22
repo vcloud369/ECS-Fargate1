@@ -1,8 +1,9 @@
 resource "aws_security_group" "ecs_security_group" {
   name        = "ecs_sg"
   description = "Allow all inbound and outbound traffic for ECS containers"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = module.vpc.vpc_id  # Use the vpc_id output from the vpc module
 }
+
 
 resource "aws_iam_role" "ecs_task_role" {
   name               = "ecs-task-role"
