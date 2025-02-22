@@ -27,3 +27,15 @@ variable "docker_registry_url" {
   description = "Docker registry URL"
   type        = string
 }
+
+variable "container_cpu" {
+  description = "ECS container CPU"
+  type        = string
+  default     = "256"
+}
+
+variable "container_memory" {
+  description = "ECS container memory"
+  type        = string
+  default     = "512"
+}
