@@ -14,3 +14,7 @@ resource "aws_subnet" "private_1" {
   cidr_block              = var.private_subnet_cidr_1
   availability_zone       = "ap-south-1a"
 }
+
+output "vpc_id" {
+  value = aws_vpc.main.id
+}
