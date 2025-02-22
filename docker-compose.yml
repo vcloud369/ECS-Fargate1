@@ -1,0 +1,20 @@
+version: '3'
+services:
+  patient-service:
+    build:
+      context: ./patient-service
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+  appointment-service:
+    build:
+      context: ./appointment-service
+    ports:
+      - "3001:3001"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
