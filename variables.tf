@@ -13,11 +13,6 @@ variable "private_subnet_cidr_1" {
   type        = string
 }
 
-variable "instance_type" {
-  description = "EC2 instance type"
-  type        = string
-}
-
 variable "ecs_cluster_name" {
   description = "ECS Cluster Name"
   type        = string
