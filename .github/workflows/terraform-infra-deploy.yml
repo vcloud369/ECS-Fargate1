@@ -1,10 +1,11 @@
-name: Terraform infra & app Deploy
+name: Terraform Infra & App Deploy
 
 on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  # Job 1: Create Infrastructure using Terraform
+  create-infra:
     runs-on: ubuntu-latest
     steps:
       # Step 1: Checkout code
@@ -22,53 +23,72 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
+      # Step 3: Set AWS region
+      - name: Set AWS region
+        run: echo "AWS_REGION=ap-south-1" >> $GITHUB_ENV 
+
+      # Step 4: Set up Terraform
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      # Step 5: Terraform Init
+      - name: Terraform Init
+        run: terraform init
+
+      # Step 6: Terraform Plan
+      - name: Terraform Plan
+        run: terraform plan
+
+      # Step 7: Terraform Apply
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+
+  # Job 2: Deploy the application (Depends on 'create-infra' job)
+  deploy-app:
+    runs-on: ubuntu-latest
+    needs: create-infra  # Ensures this job runs only after the infrastructure is created
+    steps:
+      # Step 1: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 2: Configure AWS Credentials
+      - name: Configure AWS credentials for Docker/ECR
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
       # Step 3: Set up Docker Buildx for multi-platform builds
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      # Step 4: Set AWS region
-      - name: Set AWS region
-        run: echo "AWS_REGION=ap-south-1" >> $GITHUB_ENV 
-
-      # Step 5: Log in to Amazon ECR
+      # Step 4: Log in to Amazon ECR
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
         with:
           region: ap-south-1
 
-      # Step 6: Build patient-service Docker image
+      # Step 5: Build patient-service Docker image
       - name: Build patient-service Docker image
         run: |
           docker build -t 314146309097.dkr.ecr.ap-south-1.amazonaws.com/patient-service:latest -f patient-service/Dockerfile patient-service
-        
-      # Step 7: Build appointment-service Docker image
+
+      # Step 6: Build appointment-service Docker image
       - name: Build appointment-service Docker image
         run: |
           docker build -t 314146309097.dkr.ecr.ap-south-1.amazonaws.com/appointment-service:latest -f appointment-service/Dockerfile appointment-service
 
-      # Step 8: Push patient-service Docker image to ECR
+      # Step 7: Push patient-service Docker image to ECR
       - name: Push patient-service Docker image to ECR
         run: |
           docker push 314146309097.dkr.ecr.ap-south-1.amazonaws.com/patient-service:latest
 
-      # Step 9: Push appointment-service Docker image to ECR
+      # Step 8: Push appointment-service Docker image to ECR
       - name: Push appointment-service Docker image to ECR
         run: |
           docker push 314146309097.dkr.ecr.ap-south-1.amazonaws.com/appointment-service:latest
-
-      # Step 10: Set up Terraform
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
-
-      # Step 11: Terraform Init
-      - name: Terraform Init
-        run: terraform init
-
-      # Step 12: Terraform Plan
-      - name: Terraform Plan
-        run: terraform plan
-
-      # Step 13: Terraform Apply
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
-    
