@@ -4,20 +4,17 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Job 1: Checkout Code
-  checkout:
+  deploy:
     runs-on: ubuntu-latest
     steps:
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  # Job 2: Configure AWS Credentials
-  aws-credentials:
-    runs-on: ubuntu-latest
-    steps:
+      # Step 2: Configure AWS Credentials
       - name: Configure AWS credentials for Terraform
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -25,76 +22,55 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-  # Job 3: Build Docker Images
-  build-docker-images:
-    runs-on: ubuntu-latest
-    needs: [checkout, aws-credentials]
-    steps:
-      # Set up Docker Buildx for multi-platform builds
+      # Step 3: Set up Docker Buildx for multi-platform builds
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Configure AWS credentials for Terraform
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1
-
+      # Step 4: Set AWS region
       - name: Set AWS region
         run: echo "AWS_REGION=ap-south-1" >> $GITHUB_ENV 
 
-      # Log in to Amazon ECR
+      # Step 5: Log in to Amazon ECR
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
         with:
           region: ap-south-1
 
-      # Build the patient-service Docker image
+      # Step 6: Build patient-service Docker image
       - name: Build patient-service Docker image
         run: |
           docker build -t 314146309097.dkr.ecr.ap-south-1.amazonaws.com/patient-service:latest -f patient-service/Dockerfile patient-service
         
-      # Build the appointment-service Docker image
+      # Step 7: Build appointment-service Docker image
       - name: Build appointment-service Docker image
         run: |
           docker build -t 314146309097.dkr.ecr.ap-south-1.amazonaws.com/appointment-service:latest -f appointment-service/Dockerfile appointment-service
-        
-  # Job 4: Push Docker Images to ECR
-  push-docker-images:
-    runs-on: ubuntu-latest
-    needs: [build-docker-images]
-    steps:
-      # Push patient-service Docker image to ECR
+
+      # Step 8: Push patient-service Docker image to ECR
       - name: Push patient-service Docker image to ECR
         run: |
           docker push 314146309097.dkr.ecr.ap-south-1.amazonaws.com/patient-service:latest
 
-      # Push appointment-service Docker image to ECR
+      # Step 9: Push appointment-service Docker image to ECR
       - name: Push appointment-service Docker image to ECR
         run: |
           docker push 314146309097.dkr.ecr.ap-south-1.amazonaws.com/appointment-service:latest
 
-  # Job 5: Deploy Application Using Terraform
-  deploy-application:
-    runs-on: ubuntu-latest
-    needs: [push-docker-images]
-    steps:
-      # Set up Terraform
+      # Step 10: Set up Terraform
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
 
-      # Initialize Terraform
+      # Step 11: Terraform Init
       - name: Terraform Init
         run: terraform init
         working-directory: terraform  # Ensure Terraform runs from the correct directory
 
-      # Run Terraform Plan
+      # Step 12: Terraform Plan
       - name: Terraform Plan
         run: terraform plan -var-file=env/dev/dev.tfvars
         working-directory: terraform  # Ensure Terraform runs from the correct directory
 
-      # Apply Terraform to create resources (e.g., ECR repositories)
+      # Step 13: Terraform Apply
       - name: Terraform Apply
         run: terraform apply -var-file=env/dev/dev.tfvars -auto-approve
         working-directory: terraform  # Ensure Terraform runs from the correct directory
