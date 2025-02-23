@@ -1,46 +1,76 @@
-name: Terraform Destroy
+name: Terraform Infra & App Destroy
 
 on:
   workflow_dispatch:
- 
-permissions:
-  id-token: write
-  contents: write
-  pull-requests: write
- 
+
 jobs:
-  terraform:
+  # Job 1: Destroy Infrastructure using Terraform
+  destroy-infra:
     runs-on: ubuntu-latest
- 
     steps:
-      # Step 1: Checkout Code
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      # Step 1: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
- 
+
       # Step 2: Configure AWS Credentials
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials for Terraform
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: 'us-east-1'
- 
-      # Step 3: Setup Terraform 
-      - name: Setup Terraform
+          aws-region: ap-south-1
+
+      # Step 3: Set AWS region
+      - name: Set AWS region
+        run: echo "AWS_REGION=ap-south-1" >> $GITHUB_ENV
+
+      # Step 4: Set up Terraform
+      - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.0.0
- 
+
       # Step 5: Terraform Init
       - name: Terraform Init
         run: terraform init
 
-     # Step 6: Terraform Plan
-      - name: Terraform Plan
-        run: terraform plan
-
-      - name: Destroy
+      # Step 6: Terraform Destroy
+      - name: Terraform Destroy
         run: terraform destroy -auto-approve
+
+  # Job 2: Remove the deployed application (Depends on 'destroy-infra' job)
+  destroy-app:
+    runs-on: ubuntu-latest
+    needs: destroy-infra  # Ensures this job runs only after the infrastructure is destroyed
+    steps:
+      # Step 1: Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 2: Configure AWS Credentials
+      - name: Configure AWS credentials for Docker/ECR
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      # Step 3: Log in to Amazon ECR
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          region: ap-south-1
+
+      # Step 4: Delete patient-service Docker image from ECR
+      - name: Delete patient-service Docker image from ECR
+        run: |
+          aws ecr batch-delete-image --repository-name patient-service --image-ids imageTag=latest
+
+      # Step 5: Delete appointment-service Docker image from ECR
+      - name: Delete appointment-service Docker image from ECR
+        run: |
+          aws ecr batch-delete-image --repository-name appointment-service --image-ids imageTag=latest
