@@ -50,12 +50,12 @@ jobs:
       # Build the patient-service Docker image
       - name: Build patient-service Docker image
         run: |
-          docker build -t 314146309097.dkr.ecr.ap-south-1.amazonaws.com/patient-service:latest -f ./patient-service/Dockerfile patient-service
+          docker build -t 314146309097.dkr.ecr.ap-south-1.amazonaws.com/patient-service:latest -f ./patient-service/Dockerfile ./patient-service
 
       # Build the appointment-service Docker image
       - name: Build appointment-service Docker image
         run: |
-          docker build -t 314146309097.dkr.ecr.ap-south-1.amazonaws.com/appointment-service:latest -f ./appointment-service/Dockerfile appointment-service
+          docker build -t 314146309097.dkr.ecr.ap-south-1.amazonaws.com/appointment-service:latest -f ./appointment-service/Dockerfile ./appointment-service
 
   # Job 4: Push Docker Images to ECR
   push-docker-images:
