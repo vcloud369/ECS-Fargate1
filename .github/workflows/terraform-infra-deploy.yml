@@ -63,14 +63,12 @@ jobs:
       # Step 11: Terraform Init
       - name: Terraform Init
         run: terraform init
-        working-directory: terraform  # Ensure Terraform runs from the correct directory
 
       # Step 12: Terraform Plan
       - name: Terraform Plan
         run: terraform plan -var-file=env/dev/dev.tfvars
-        working-directory: terraform  # Ensure Terraform runs from the correct directory
 
       # Step 13: Terraform Apply
       - name: Terraform Apply
         run: terraform apply -var-file=env/dev/dev.tfvars -auto-approve
-        working-directory: terraform  # Ensure Terraform runs from the correct directory
+    
