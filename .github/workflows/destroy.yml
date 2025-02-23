@@ -36,7 +36,11 @@ jobs:
  
       # Step 5: Terraform Init
       - name: Terraform Init
-        run: terraform init -reconfigure
+        run: terraform init
+
+     # Step 6: Terraform Plan
+      - name: Terraform Plan
+        run: terraform plan
 
       - name: Destroy
         run: terraform destroy -auto-approve
