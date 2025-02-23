@@ -34,6 +34,8 @@ jobs:
       # Log in to Amazon ECR
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
+        with:
+          region: ${{ secrets.AWS_REGION }}
 
       # Build the patient-service Docker image
       - name: Build patient-service Docker image
