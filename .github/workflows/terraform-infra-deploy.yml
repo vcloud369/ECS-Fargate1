@@ -51,12 +51,14 @@ jobs:
       - name: Build patient-service Docker image
         run: |
           docker build -t 314146309097.dkr.ecr.ap-south-1.amazonaws.com/patient-service:latest -f ./patient-service/Dockerfile ./patient-service
-
+        working-directory: ./
+        
       # Build the appointment-service Docker image
       - name: Build appointment-service Docker image
         run: |
           docker build -t 314146309097.dkr.ecr.ap-south-1.amazonaws.com/appointment-service:latest -f ./appointment-service/Dockerfile ./appointment-service
-
+        working-directory: ./
+        
   # Job 4: Push Docker Images to ECR
   push-docker-images:
     runs-on: ubuntu-latest
