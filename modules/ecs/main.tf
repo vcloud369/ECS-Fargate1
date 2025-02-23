@@ -3,47 +3,81 @@ resource "aws_ecs_cluster" "main" {
 }
 
 resource "aws_ecs_task_definition" "patient_service" {
-  family                   = "patient-service-task"
-  execution_role_arn       = aws_iam_role.ecs_task_role.arn
-  task_role_arn            = aws_iam_role.ecs_task_role.arn
+  family                   = var.ecs_task_family
+  execution_role_arn       = var.ecs_execution_role_arn
+  task_role_arn            = var.ecs_task_role_arn
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = var.container_cpu
-  memory                   = var.container_memory
-  
+
+  cpu       = "256"
+  memory    = "512"
+
   container_definitions = jsonencode([{
     name      = "patient-service"
-    image     = var.docker_registry_url
+    image     = var.patient_service_image
+    cpu       = 256
+    memory    = 512
     essential = true
     portMappings = [
       {
-        containerPort = 80
-        hostPort      = 80
+        containerPort = 3001
+        hostPort      = 3001
         protocol      = "tcp"
-      },
+      }
     ]
   }])
 }
 
 resource "aws_ecs_task_definition" "appointment_service" {
-  family                   = "appointment-service-task"
-  execution_role_arn       = aws_iam_role.ecs_task_role.arn
-  task_role_arn            = aws_iam_role.ecs_task_role.arn
+  family                   = var.ecs_task_family
+  execution_role_arn       = var.ecs_execution_role_arn
+  task_role_arn            = var.ecs_task_role_arn
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = var.container_cpu
-  memory                   = var.container_memory
-  
+
+  cpu       = "256"
+  memory    = "512"
+
   container_definitions = jsonencode([{
     name      = "appointment-service"
-    image     = var.docker_registry_url
+    image     = var.appointment_service_image
+    cpu       = 256
+    memory    = 512
     essential = true
     portMappings = [
       {
-        containerPort = 80
-        hostPort      = 80
+        containerPort = 3002
+        hostPort      = 3002
         protocol      = "tcp"
-      },
+      }
     ]
   }])
+}
+
+resource "aws_ecs_service" "patient_service" {
+  name            = "patient-service"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.patient_service.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets          = [var.subnet_id]
+    security_groups = [var.security_group_id]
+    assign_public_ip = true
+  }
+}
+
+resource "aws_ecs_service" "appointment_service" {
+  name            = "appointment-service"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.appointment_service.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets          = [var.subnet_id]
+    security_groups = [var.security_group_id]
+    assign_public_ip = true
+  }
 }
