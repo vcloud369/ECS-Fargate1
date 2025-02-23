@@ -31,6 +31,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Set AWS region
+        run: echo "AWS_REGION=ap-south-1" >> $GITHUB_ENV 
+
       # Log in to Amazon ECR
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
