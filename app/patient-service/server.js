@@ -9,6 +9,10 @@ const express = require('express');
       { id: '1', name: 'John Doe', age: 30, condition: 'Healthy' },
       { id: '2', name: 'Jane Smith', age: 45, condition: 'Hypertension' }
     ];
+
+    app.get('/', (req, res) => {
+       res.send('Welcome to the appointment Service API!');
+      });
     
     app.get('/health', (req, res) => {
       res.status(200).json({ status: 'OK', service: 'Patient Service' });
