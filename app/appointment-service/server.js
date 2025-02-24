@@ -4,15 +4,16 @@ const port = process.env.PORT || 3001;
 
 app.use(express.json());
 
+// Define a route for the root path
+app.get('/', (req, res) => {
+  res.send('Welcome to the appointment Service API!');
+});
+
 // In-memory data store (replace with a database in a real application)
 let appointments = [
   { id: '1', patientId: '1', date: '2023-06-15', time: '10:00', doctor: 'Dr. Smith' },
   { id: '2', patientId: '2', date: '2023-06-16', time: '14:30', doctor: 'Dr. Johnson' }
 ];
-
-app.get('/', (req, res) => {
-  res.send('Welcome to the appointment Service API!');
-});
 
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', service: 'Appointment Service' });
@@ -56,4 +57,11 @@ app.post('/appointments', (req, res) => {
       message: 'Appointment scheduled successfully',
       appointment: newAppointment 
     });
-  } catch (error)
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Appointment service listening at http://0.0.0.0:${port}`);
+});
