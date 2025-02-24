@@ -76,12 +76,12 @@ jobs:
       # Step 5: Build patient-service Docker image
       - name: Build patient-service Docker image
         run: |
-          docker build -t 314146309097.dkr.ecr.ap-south-1.amazonaws.com/patient-service:latest -f patient-service/Dockerfile patient-service
+          docker build -t 314146309097.dkr.ecr.ap-south-1.amazonaws.com/patient-service:latest -f app/patient-service/Dockerfile app/patient-service
 
       # Step 6: Build appointment-service Docker image
       - name: Build appointment-service Docker image
         run: |
-          docker build -t 314146309097.dkr.ecr.ap-south-1.amazonaws.com/appointment-service:latest -f appointment-service/Dockerfile appointment-service
+          docker build -t 314146309097.dkr.ecr.ap-south-1.amazonaws.com/appointment-service:latest -f app/appointment-service/Dockerfile app/appointment-service
 
       # Step 7: Push patient-service Docker image to ECR
       - name: Push patient-service Docker image to ECR
