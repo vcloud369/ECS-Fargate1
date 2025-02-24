@@ -10,6 +10,10 @@ let appointments = [
   { id: '2', patientId: '2', date: '2023-06-16', time: '14:30', doctor: 'Dr. Johnson' }
 ];
 
+app.get('/', (req, res) => {
+  res.send('Welcome to the appointment Service API!');
+});
+
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', service: 'Appointment Service' });
 });
