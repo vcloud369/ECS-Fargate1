@@ -20,8 +20,8 @@ resource "aws_ecs_task_definition" "patient_service" {
     essential = true
     portMappings = [
       {
-        containerPort = 3001
-        hostPort      = 3001
+        containerPort = 3000  # Updated for the Patient Service to listen on port 3000
+        hostPort      = 3000  # Keep the host port the same
         protocol      = "tcp"
       }
     ]
@@ -46,8 +46,8 @@ resource "aws_ecs_task_definition" "appointment_service" {
     essential = true
     portMappings = [
       {
-        containerPort = 3002
-        hostPort      = 3002
+        containerPort = 3001  # Updated for the Appointment Service to listen on port 3001
+        hostPort      = 3001  # Keep the host port the same
         protocol      = "tcp"
       }
     ]
@@ -67,6 +67,7 @@ resource "aws_ecs_service" "patient_service" {
     assign_public_ip = true
   }
 }
+
 
 resource "aws_ecs_service" "appointment_service" {
   name            = "appointment-service"
