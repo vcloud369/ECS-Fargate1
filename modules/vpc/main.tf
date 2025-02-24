@@ -69,8 +69,8 @@ resource "aws_subnet" "private_subnet_2" {
   }
 }
 
-resource "aws_iam_role" "ecs_execution_role" {
-  name = "ecs-execution-role"
+resource "aws_iam_role" "ecs_task_role" {
+  name = "ecs-task-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -86,20 +86,21 @@ resource "aws_iam_role" "ecs_execution_role" {
   })
 
   tags = {
-    Name = "ecs-execution-role"
+    Name = "ecs-task-role"
   }
 }
-resource "aws_iam_role_policy_attachment" "ecs_execution" {
-  role = aws_iam_role.ecs_task_role.name
+
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
+  role       = aws_iam_role.ecs_task_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
 
-resource "aws_iam_role" "ecs_task_role" {
-  name = "ecs-task-role"
-  role = aws_iam_role.ecs_task_role.id
+resource "aws_iam_policy" "ecs_task_policy" {
+  name        = "ecs-task-policy"
+  description = "Allow ECS tasks to access ECR"
 
-   policy = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -113,11 +114,13 @@ resource "aws_iam_role" "ecs_task_role" {
       }
     ]
   })
-
-  tags = {
-    Name = "ecs-task-role"
-  }
 }
+
+resource "aws_iam_role_policy_attachment" "ecs_task_policy_attachment" {
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = aws_iam_policy.ecs_task_policy.arn
+}
+
 
 # ECS Logging and X-Ray Policy for ECS Task Role
 resource "aws_iam_policy" "ecs_logging_xray_policy" {
