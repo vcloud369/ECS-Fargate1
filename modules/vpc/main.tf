@@ -118,29 +118,6 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
 }
 
 
-resource "aws_iam_policy" "ecs_task_policy" {
-  name        = "ecs-task-policy"
-  description = "Allow ECS tasks to access ECR"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect   = "Allow"
-        Action   = [
-          "ecr:GetAuthorizationToken",
-          "ecr:BatchGetImage",
-          "ecr:BatchCheckLayerAvailability"
-        ]
-        Resource = "arn:aws:ecr:ap-south-1:314146309097:*"
-      }
-    ]
-  })
-}
-
-
-
-
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
