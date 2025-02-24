@@ -18,3 +18,13 @@ variable "lb_subnets" {
   description = "The subnets for the ALB"
   type        = list(string)
 }
+
+variable "patient_service_ip" {
+  description = "The ECS patient service IP"
+  type        = string
+}
+
+variable "appointment_service_ip" {
+  description = "The ECS appointment service IP"
+  type        = string
+}
