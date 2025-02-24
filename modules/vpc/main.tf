@@ -132,7 +132,7 @@ resource "aws_iam_policy" "ecs_task_policy" {
           "ecr:BatchGetImage",
           "ecr:BatchCheckLayerAvailability"
         ]
-        Resource = "arn:aws:ecr:us-west-2:183114607892:repository/*"
+        Resource = "arn:aws:ecr:ap-south-1:314146309097:*"
       }
     ]
   })
