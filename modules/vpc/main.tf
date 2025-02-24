@@ -69,9 +69,8 @@ resource "aws_subnet" "private_subnet_2" {
   }
 }
 
-# ECS Task Execution Role
-resource "aws_iam_role" "ecs_task_role" {
-  name = "ecs-task-role"
+resource "aws_iam_role" "ecs_execution_role" {
+  name = "ecs-execution-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -87,22 +86,20 @@ resource "aws_iam_role" "ecs_task_role" {
   })
 
   tags = {
-    Name = "ecs-task-role"
+    Name = "ecs-execution-role"
   }
 }
-
-# ECS Task Execution Role Policy Attachment
 resource "aws_iam_role_policy_attachment" "ecs_execution" {
-  role       = aws_iam_role.ecs_task_role.name
+  role = aws_iam_role.ecs_task_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-# ECR Access Policy for ECS Tasks
-resource "aws_iam_role_policy" "ecs_task_ecr_policy" {
-  name = "ecsTaskECRPullPolicy"
+
+resource "aws_iam_role" "ecs_task_role" {
+  name = "ecs-task-role"
   role = aws_iam_role.ecs_task_role.id
 
-  policy = jsonencode({
+   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -112,10 +109,14 @@ resource "aws_iam_role_policy" "ecs_task_ecr_policy" {
           "ecr:BatchGetImage",
           "ecr:BatchCheckLayerAvailability"
         ]
-        Resource = "arn:aws:ecr:ap-south-1:314146309097:repository/*"
+        Resource = "arn:aws:ecr:us-west-2:183114607892:repository/*"
       }
     ]
   })
+
+  tags = {
+    Name = "ecs-task-role"
+  }
 }
 
 # ECS Logging and X-Ray Policy for ECS Task Role
@@ -144,8 +145,7 @@ resource "aws_iam_policy" "ecs_logging_xray_policy" {
       }
     ]
   })
-}
-
+} 
 # Attach Logging and X-Ray Policies to ECS Task Role
 resource "aws_iam_role_policy_attachment" "ecs_execution_attach_logging" {
   role       = aws_iam_role.ecs_task_role.name
@@ -156,6 +156,7 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_attach_xray" {
   role       = aws_iam_role.ecs_task_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
+
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
