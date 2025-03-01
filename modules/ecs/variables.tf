@@ -38,4 +38,13 @@ variable "security_group_id" {
   type        = string
 }
 
+variable "appointment_tg_arn" {
+  description = "appointment targetgroup ARN"
+  type        = string
+}
+
+variable "patient_tg_arn" {
+  description = "patient targetgroup ARN"
+  type        = string
+}
 
