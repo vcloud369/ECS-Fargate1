@@ -60,6 +60,8 @@ module "ecs" {
   appointment_service_image = var.appointment_service_image
   subnet_id            = module.vpc.public_subnet_1_id
   security_group_id    = aws_security_group.ecs_sg.id
+  patient_tg_arn       = module.alb.patient_tg_arn
+  appointment_tg_arn   = module.alb.appointment_tg_arn
 }
 
 module "ecr" {
@@ -77,4 +79,9 @@ module "alb" {
   vpc_id                     = module.vpc.vpc_id
   patient_service_ip         = module.ecs.patient_service_ip  # Pass ECS patient service IP from the ECS module
   appointment_service_ip     = module.ecs.appointment_service_ip  # Pass ECS appointment service IP from the ECS module
+}
+
+module "cloudwatch" {
+  source         = "./modules/cloudwatch"
+  log_group_name = var.log_group_name
 }
