@@ -12,5 +12,4 @@ ecs_task_family          = "usecase3-task-family"
 patient_service_image    = "314146309097.dkr.ecr.ap-south-1.amazonaws.com/patient-service1:latest"
 appointment_service_image = "314146309097.dkr.ecr.ap-south-1.amazonaws.com/appointment-service1:latest"
 
-alb_name                 = "dev-alb"
 log_group_name           = "ecs-cluster-logs"
