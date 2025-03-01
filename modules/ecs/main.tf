@@ -1,5 +1,14 @@
 resource "aws_ecs_cluster" "main" {
   name = var.ecs_cluster_name
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
+}
+
+resource "aws_cloudwatch_log_group" "ecs_logs" {
+  name              = "/ecs/${var.ecs_cluster_name}"
+  retention_in_days = 30  # Adjust as needed
 }
 
 resource "aws_ecs_task_definition" "patient_service" {
@@ -25,6 +34,14 @@ resource "aws_ecs_task_definition" "patient_service" {
         protocol      = "tcp"
       }
     ]
+    logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.ecs_logs.name
+          awslogs-region        = "ap-south-1"
+          awslogs-stream-prefix = "patient-service"
+        }
+    }
   }])
 }
 
@@ -51,6 +68,14 @@ resource "aws_ecs_task_definition" "appointment_service" {
         protocol      = "tcp"
       }
     ]
+    logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.ecs_logs.name
+          awslogs-region        = "ap-south-1"
+          awslogs-stream-prefix = "appointment-service"
+        }
+    }
   }])
 }
 
@@ -65,6 +90,11 @@ resource "aws_ecs_service" "patient_service" {
     subnets          = [var.subnet_id]
     security_groups = [var.security_group_id]
     assign_public_ip = true
+  }
+  load_balancer {
+    target_group_arn = var.patient_tg_arn
+    container_name   = "patient-service"
+    container_port   = 3000
   }
 }
 
@@ -81,4 +111,10 @@ resource "aws_ecs_service" "appointment_service" {
     security_groups = [var.security_group_id]
     assign_public_ip = true
   }
+  load_balancer {
+    target_group_arn = var.appointment_tg_arn
+    container_name   = "appointment-service"
+    container_port   = 3001
+  }
 }
+
