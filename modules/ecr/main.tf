@@ -1,15 +1,27 @@
-# Check if 'patient-service' ECR repository exists using Terraform's 'aws_ecr_repository' with 'count' logic
-resource "aws_ecr_repository" "patient_service" {
-  count = (length(aws_ecr_repository.patient_service) == 0) ? 1 : 0
+# Check if patient-service repository exists
+resource "null_resource" "check_patient_service_repo" {
+  provisioner "local-exec" {
+    command = "aws ecr describe-repositories --repository-names ${var.patient_service_repo_name} || true"
+  }
+}
 
-  name              = var.patient_service_repo_name
+# Create patient-service repository if it doesn't exist
+resource "aws_ecr_repository" "patient_service" {
+  depends_on = [null_resource.check_patient_service_repo]
+  name       = var.patient_service_repo_name
   image_tag_mutability = "MUTABLE"
 }
 
-# Check if 'appointment-service' ECR repository exists using Terraform's 'aws_ecr_repository' with 'count' logic
-resource "aws_ecr_repository" "appointment_service" {
-  count = (length(aws_ecr_repository.appointment_service) == 0) ? 1 : 0
+# Check if appointment-service repository exists
+resource "null_resource" "check_appointment_service_repo" {
+  provisioner "local-exec" {
+    command = "aws ecr describe-repositories --repository-names ${var.appointment_service_repo_name} || true"
+  }
+}
 
-  name              = var.appointment_service_repo_name
+# Create appointment-service repository if it doesn't exist
+resource "aws_ecr_repository" "appointment_service" {
+  depends_on = [null_resource.check_appointment_service_repo]
+  name       = var.appointment_service_repo_name
   image_tag_mutability = "MUTABLE"
 }
