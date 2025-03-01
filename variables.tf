@@ -61,7 +61,6 @@ variable "appointment_service_image" {
   default     = "314146309097.dkr.ecr.ap-south-1.amazonaws.com/appointment-service:latest"
 }
 
-
 variable "alb_name" {
   description = "The name of the Application Load Balancer"
   default     = "usecase3-alb"
