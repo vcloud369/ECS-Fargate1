@@ -37,10 +37,10 @@ jobs:
 
       # Step 6: Terraform Plan
       - name: Terraform Plan
-        run: terraform plan -var-file=env/dev /dev.tfvars
+        run: terraform plan -var-file=env/dev/dev.tfvars
 
       # Step 7: Terraform Apply
       - name: Terraform Apply
-        run: terraform apply -var-file=env/dev /dev.tfvars -auto-approve
+        run: terraform apply -var-file=env/dev/dev.tfvars -auto-approve
 
   
