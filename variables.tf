@@ -1,6 +1,6 @@
 variable "aws_region" {
   description = "AWS region to deploy resources"
-  default     = "ap-south-1"
+  default     = "us-east-1"
 }
 
 
@@ -32,12 +32,12 @@ variable "private_subnet_2_cidr" {
 
 variable "az_1" {
   description = "Availability Zone 1"
-  default     = "ap-south-1a"
+  default     = "us-east-1a"
 }
 
 variable "az_2" {
   description = "Availability Zone 2"
-  default     = "ap-south-1b"
+  default     = "us-east-1b"
 }
 
 
@@ -53,12 +53,12 @@ variable "ecs_task_family" {
 
 variable "patient_service_image" {
   description = "Docker image URL for the patient service"
-  default     = "314146309097.dkr.ecr.ap-south-1.amazonaws.com/patient-service:latest"
+  default     = "850014722537.dkr.ecr.us-east-1.amazonaws.com/patient-service:latest"
 }
 
 variable "appointment_service_image" {
   description = "Docker image URL for the appointment service"
-  default     = "314146309097.dkr.ecr.ap-south-1.amazonaws.com/appointment-service:latest"
+  default     = "850014722537.dkr.ecr.us-east-1.amazonaws.com/appointment-service:latest"
 }
 
 variable "alb_name" {

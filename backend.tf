@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
-    bucket = "manikanta-terraform-state-bucket"  
-    key    = "path/to/terraform.tfstate"        
-    region = "ap-south-1"                       
+    bucket = "veera65"  
+    key    = "terraform.tfstate"        
+    region = "us-east-1"                       
   }
 }
